@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui svg xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -20,17 +20,20 @@ win32 {
 }
 
 SOURCES += \
+    framelesswidget.cpp \
     main.cpp \
     mainwindow.cpp \
     titlebar.cpp \
     titlebarbutton.cpp
 
 HEADERS += \
+    framelesswidget.h \
     mainwindow.h \
     titlebar.h \
     titlebarbutton.h
 
 FORMS += \
+    framelesswidget.ui \
     mainwindow.ui
 
 # Default rules for deployment.
