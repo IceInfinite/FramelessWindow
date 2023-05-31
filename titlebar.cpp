@@ -11,7 +11,7 @@
 #include <QLabel>
 
 TitleBar::TitleBar(QWidget *parent)
-    : QWidget(parent), m_closeBtn(this, "/btn/close.svg")
+    : QWidget(parent), m_closeBtn(":/btn/res/close.svg", this)
     , m_isDoubleClickedEnabled(false), m_iconLabel(new QLabel(this))
     , m_titleLabel(new QLabel(this))
 {
@@ -38,7 +38,7 @@ TitleBar::TitleBar(QWidget *parent)
     m_maxBtn.setPressedBgColor(QColor(54, 57, 65));
 
     connect(&m_minBtn, &QAbstractButton::clicked, window(), &QWidget::showMinimized);
-    connect(&m_maxBtn, &QAbstractButton::clicked, &TitleBar::toggleMaxState);
+    connect(&m_maxBtn, &QAbstractButton::clicked, this, &TitleBar::toggleMaxState);
     connect(&m_closeBtn, &QAbstractButton::clicked, window(), &QWidget::close);
 
     window()->installEventFilter(this);
@@ -135,7 +135,7 @@ bool TitleBar::isDragRegion(const QPoint &pos)
             width += btn->width();
     }
 
-    return 0 < pos.x() < this->width() - width;
+    return (0 < pos.x() && pos.x() < this->width() - width);
 }
 
 bool TitleBar::hasButtonPressed()

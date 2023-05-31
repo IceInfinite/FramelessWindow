@@ -16,27 +16,27 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 win32 {
-    LIBS += -luser32
+    LIBS += -luser32 -lDwmapi -lGdi32
 }
 
 SOURCES += \
     framelesswidget.cpp \
     main.cpp \
-    mainwindow.cpp \
     titlebar.cpp \
     titlebarbutton.cpp
 
 HEADERS += \
     framelesswidget.h \
-    mainwindow.h \
     titlebar.h \
     titlebarbutton.h
 
 FORMS += \
-    framelesswidget.ui \
-    mainwindow.ui
+    framelesswidget.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    res.qrc

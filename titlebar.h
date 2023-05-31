@@ -2,6 +2,7 @@
 #define TITLEBAR_H
 
 #include <QWidget>
+#include <QLabel>
 
 #include "titlebarbutton.h"
 

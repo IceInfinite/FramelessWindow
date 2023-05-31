@@ -1,12 +1,17 @@
 #include "framelesswidget.h"
 #include "ui_framelesswidget.h"
 
+#include <cmath>
+
 #ifdef Q_OS_WIN
 #include <Windows.h>
+#include <dwmapi.h>
 #include <windowsx.h>
+#include <wingdi.h>
 #endif
 
 #include <QWindow>
+#include <QScreen>
 
 #ifdef Q_OS_WIN
 constexpr int kBorderWidth = 5;
@@ -47,13 +52,60 @@ QWindow *findWindow(HWND hWnd)
     }
 }
 
-int getResizeBorderThickness(HWND hWnd, bool horizontal = true)
+int getDpiForWindow(HWND hWnd, bool horizontal)
+{
+#if(WINVER >= 0x0605)
+    return ::GetDpiForWindow(hWnd);
+#endif
+    HDC hdc = ::GetDC(hWnd);
+    int dpiX = ::GetDeviceCaps(hdc, LOGPIXELSX);
+    int dpiY = ::GetDeviceCaps(hdc, LOGPIXELSY);
+    ReleaseDC(hWnd, hdc);
+    if (dpiX > 0 && horizontal)
+        return dpiX;
+    else if (dpiY > 0 && !horizontal)
+        return dpiY;
+
+    return 96;
+}
+
+int getSystemMetrics(HWND hWnd, int index, bool horizontal)
+{
+#if(WINVER >= 0x0605)
+    int dpi = getDpiForWindow(hWnd, horizontal);
+    return ::GetSystemMetricsForDpi(index, dpi);
+#endif
+    return ::GetSystemMetrics(index);
+}
+
+bool isCompositionEnabled()
+{
+    BOOL result = 0;
+    ::DwmIsCompositionEnabled(&result);
+    return static_cast<bool>(result);
+}
+
+int getResizeBorderThickness(HWND hWnd, bool horizontal)
 {
     QWindow * window = findWindow(hWnd);
     if (!window)
         return 0;
 
-    return 0;
+    int frame = SM_CYSIZEFRAME;
+    if (horizontal)
+        frame = SM_CXSIZEFRAME;
+
+    int result = getSystemMetrics(hWnd, frame, horizontal) + 
+                 getSystemMetrics(hWnd, 92, horizontal);
+
+    if (result > 0)
+        return result;
+
+    int thickness = 8;
+    if (!isCompositionEnabled())
+        thickness = 4;
+
+    return std::round(thickness * window->devicePixelRatio());
 }
 
 #endif
@@ -68,7 +120,7 @@ FramelessWidget::FramelessWidget(QWidget *parent) :
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint |
                    Qt::WindowMinMaxButtonsHint);
     
-    connect(windowHandle(), &QWindow::screenChanged, this, &FramelessWidget::onScreenChanged);
+    // connect(windowHandle(), &QWindow::screenChanged, this, &FramelessWidget::onScreenChanged);
     m_titleBar->raise();
 }
 
@@ -95,6 +147,7 @@ void FramelessWidget::setResizeEnabled(bool enable)
 
 void FramelessWidget::resizeEvent(QResizeEvent *event)
 {
+    Q_UNUSED(event)
     m_titleBar->resize(width(), m_titleBar->height());
 }
 
@@ -145,11 +198,11 @@ bool FramelessWidget::nativeEvent(const QByteArray &eventType, void *message,
         case WM_NCCALCSIZE:
         {
             RECT rect;
-            if (msg->wParam == TRUE)
+            if (msg->wParam)
                 rect =
                     reinterpret_cast<LPNCCALCSIZE_PARAMS>(msg->lParam)->rgrc[0];
-            else 
-                rect = *reinterpret_cast<LPRECT>(msg->lParam);
+//            else
+//                rect = *reinterpret_cast<LPRECT>(msg->lParam);
 
             bool max = IsMaximized(msg->hwnd);
             bool fullScreen = isFullScreenWin(msg->hwnd);
@@ -181,9 +234,10 @@ bool FramelessWidget::nativeEvent(const QByteArray &eventType, void *message,
     return QWidget::nativeEvent(eventType, message, result);
 }
 
-void FramelessWidget::onScreenChanged()
+void FramelessWidget::onScreenChanged(QScreen *screen)
 {
 #ifdef Q_OS_WIN
+    Q_UNUSED(screen)
     HWND hWnd = reinterpret_cast<HWND>(windowHandle()->winId());
     ::SetWindowPos(hWnd, nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE |
                    SWP_FRAMECHANGED);

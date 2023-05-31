@@ -2,6 +2,7 @@
 #define FRAMELESSWIDGET_H
 
 #include <QWidget>
+#include <QScreen>
 
 #include "titlebar.h"
 
@@ -25,7 +26,7 @@ protected:
     virtual bool nativeEvent(const QByteArray &eventType, void *message, 
                              long *result) override;
 private slots:
-    void onScreenChanged();
+    void onScreenChanged(QScreen *screen);
 
 private:
     Ui::FramelessWidget *m_ui;

@@ -159,7 +159,7 @@ void TitleBarButton::mousePressEvent(QMouseEvent *event)
     QAbstractButton::mousePressEvent(event);
 }
 
-SvgTitleBarButton::SvgTitleBarButton(QWidget *parent, const QString &iconPath)
+SvgTitleBarButton::SvgTitleBarButton(const QString &iconPath, QWidget *parent)
     : TitleBarButton(parent)
 {
     setIcon(iconPath);
@@ -275,8 +275,8 @@ void MaximizeButton::paintEvent(QPaintEvent *event)
     }
 }
 
-CloseButton::CloseButton(QWidget *parent, const QString &iconPath)
-    : SvgTitleBarButton(parent, iconPath)
+CloseButton::CloseButton(const QString &iconPath, QWidget *parent)
+    : SvgTitleBarButton(iconPath, parent)
 {
     setHoverColor(Qt::white);
     setPressedColor(Qt::white);

@@ -64,7 +64,7 @@ private:
 class SvgTitleBarButton : public TitleBarButton
 {
 public:
-    SvgTitleBarButton(QWidget *parent = nullptr, const QString &iconPath);
+    SvgTitleBarButton(const QString &iconPath, QWidget *parent = nullptr);
     virtual ~SvgTitleBarButton() = default;
 
     void setIcon(const QString &iconPath);
@@ -104,7 +104,7 @@ private:
 class CloseButton : public SvgTitleBarButton
 {
 public:
-    CloseButton(QWidget *parent = nullptr, const QString &iconPath);
+    CloseButton(const QString &iconPath, QWidget *parent = nullptr);
     virtual ~CloseButton() = default;
 };
 
