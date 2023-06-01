@@ -40,7 +40,7 @@ public:
     void setPressedBgColor(const QColor &color);
     QColor getPressedBgColor() const;
 
-    void getCurColors(QColor &color, QColor bgColor) const;
+    void getCurColors(QColor &color, QColor &bgColor) const;
 
 protected:
     virtual void enterEvent(QEvent *event) override;
@@ -108,4 +108,4 @@ public:
     virtual ~CloseButton() = default;
 };
 
-#endif // TITLEBARBUTTON_H
+#endif  // TITLEBARBUTTON_H

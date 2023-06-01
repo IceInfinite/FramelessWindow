@@ -2,4 +2,7 @@
     <qresource prefix="/btn">
         <file>res/close.svg</file>
     </qresource>
+    <qresource prefix="/">
+        <file>logo/logo.png</file>
+    </qresource>
 </RCC>

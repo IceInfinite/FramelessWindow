@@ -5,13 +5,14 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+//    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+//    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
     QApplication a(argc, argv);
     FramelessWidget w;
     w.setWindowTitle("Frameless Window");
-    w.setWindowIcon(QIcon("logo/logo.png"));
-    // w.setStyleSheet("background:white");
+    w.setWindowIcon(QIcon(":/logo/logo.png"));
+    w.setStyleSheet("background:white");
     w.show();
     return a.exec();
 }

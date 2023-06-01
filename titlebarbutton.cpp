@@ -16,6 +16,7 @@ TitleBarButton::TitleBarButton(QWidget *parent) : QAbstractButton(parent)
     m_normalColor = QColor(0, 0, 0);
     m_hoverColor = QColor(0, 0, 0);
     m_pressedColor = QColor(0, 0, 0);
+
     m_normalBgColor = QColor(0, 0, 0, 0);
     m_hoverBgColor = QColor(0, 0, 0, 26);
     m_pressedBgColor = QColor(0, 0, 0, 51);
@@ -25,7 +26,7 @@ void TitleBarButton::setState(TitleBarButtonState state)
 {
     if (m_state == state)
         return;
-    
+
     m_state = state;
     update();
 }
@@ -39,7 +40,7 @@ void TitleBarButton::setNormalColor(const QColor &color)
 {
     if (m_normalColor == color)
         return;
-    
+
     m_normalColor = color;
     update();
 }
@@ -53,7 +54,7 @@ void TitleBarButton::setHoverColor(const QColor &color)
 {
     if (m_hoverColor == color)
         return;
-    
+
     m_hoverColor = color;
     update();
 }
@@ -67,7 +68,7 @@ void TitleBarButton::setPressedColor(const QColor &color)
 {
     if (m_pressedColor == color)
         return;
-    
+
     m_pressedColor = color;
     update();
 }
@@ -81,7 +82,7 @@ void TitleBarButton::setNormalBgColor(const QColor &color)
 {
     if (m_normalBgColor == color)
         return;
-    
+
     m_normalBgColor = color;
     update();
 }
@@ -95,7 +96,7 @@ void TitleBarButton::setHoverBgColor(const QColor &color)
 {
     if (m_hoverBgColor == color)
         return;
-    
+
     m_hoverBgColor = color;
     update();
 }
@@ -109,7 +110,7 @@ void TitleBarButton::setPressedBgColor(const QColor &color)
 {
     if (m_pressedBgColor == color)
         return;
-    
+
     m_pressedBgColor = color;
     update();
 }
@@ -119,22 +120,22 @@ QColor TitleBarButton::getPressedBgColor() const
     return m_pressedBgColor;
 }
 
-void TitleBarButton::getCurColors(QColor &color, QColor bgColor) const
+void TitleBarButton::getCurColors(QColor &color, QColor &bgColor) const
 {
     switch (m_state)
     {
-    case TitleBarButtonState::kNormal:
-        color = m_normalColor;
-        bgColor = m_normalBgColor;
-        break;
-    case TitleBarButtonState::kHover:
-        color = m_hoverColor;
-        bgColor = m_hoverBgColor;
-        break;
-    case TitleBarButtonState::kPressed:
-        color = m_pressedColor;
-        bgColor = m_pressedBgColor;
-        break;
+        case TitleBarButtonState::kNormal:
+            color = m_normalColor;
+            bgColor = m_normalBgColor;
+            break;
+        case TitleBarButtonState::kHover:
+            color = m_hoverColor;
+            bgColor = m_hoverBgColor;
+            break;
+        case TitleBarButtonState::kPressed:
+            color = m_pressedColor;
+            bgColor = m_pressedBgColor;
+            break;
     }
 }
 
@@ -175,9 +176,10 @@ void SvgTitleBarButton::setIcon(const QString &iconPath)
 
 void SvgTitleBarButton::paintEvent(QPaintEvent *event)
 {
+    Q_UNUSED(event)
     QPainter painter(this);
-    painter.setRenderHints(QPainter::Antialiasing | 
-                           QPainter::SmoothPixmapTransform);
+    painter.setRenderHints(
+        QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     QColor color, bgColor;
     getCurColors(color, bgColor);
 
@@ -199,13 +201,11 @@ void SvgTitleBarButton::paintEvent(QPaintEvent *event)
     render.render(&painter, QRectF(rect()));
 }
 
-MinimizeButton::MinimizeButton(QWidget *parent) : TitleBarButton(parent)
-{
-
-}
+MinimizeButton::MinimizeButton(QWidget *parent) : TitleBarButton(parent) {}
 
 void MinimizeButton::paintEvent(QPaintEvent *event)
 {
+    Q_UNUSED(event)
     QPainter painter(this);
     QColor color, bgColor;
     getCurColors(color, bgColor);
@@ -232,13 +232,14 @@ void MaximizeButton::setMaxState(bool isMax)
 {
     if (m_isMax == isMax)
         return;
-    
+
     m_isMax = isMax;
     setState(TitleBarButtonState::kNormal);
 }
 
 void MaximizeButton::paintEvent(QPaintEvent *event)
 {
+    Q_UNUSED(event)
     QPainter painter(this);
     QColor color, bgColor;
     getCurColors(color, bgColor);
@@ -253,13 +254,13 @@ void MaximizeButton::paintEvent(QPaintEvent *event)
     QPen pen(color, 1);
     pen.setCosmetic(true);
     painter.setPen(pen);
-    
+
     qreal r = devicePixelRatioF();
     painter.scale(1 / r, 1 / r);
-    if (m_isMax)
+    if (!m_isMax)
     {
         painter.drawRect(18 * r, 11 * r, 10 * r, 10 * r);
-    } 
+    }
     else
     {
         painter.drawRect(18 * r, 13 * r, 8 * r, 8 * r);

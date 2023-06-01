@@ -30,8 +30,7 @@ HEADERS += \
     titlebar.h \
     titlebarbutton.h
 
-FORMS += \
-    framelesswidget.ui
+FORMS +=
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

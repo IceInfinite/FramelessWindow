@@ -4,17 +4,22 @@
 #include <Windows.h>
 #endif
 
+#include <QDebug>
 #include <QEvent>
-#include <QMouseEvent>
 #include <QHBoxLayout>
-#include <QPoint>
 #include <QLabel>
+#include <QMouseEvent>
+#include <QPoint>
 
 TitleBar::TitleBar(QWidget *parent)
-    : QWidget(parent), m_closeBtn(":/btn/res/close.svg", this)
-    , m_isDoubleClickedEnabled(false), m_iconLabel(new QLabel(this))
-    , m_titleLabel(new QLabel(this))
+    : QWidget(parent),
+      m_isDoubleClickedEnabled(true),
+      m_iconLabel(new QLabel(this)),
+      m_titleLabel(new QLabel(this))
 {
+    m_maxBtn = new MaximizeButton(this);
+    m_minBtn = new MinimizeButton(this);
+    m_closeBtn = new CloseButton(":/btn/res/close.svg", this);
     QHBoxLayout *hBoxLayout = new QHBoxLayout(this);
     resize(200, 32);
     setFixedHeight(32);
@@ -23,23 +28,25 @@ TitleBar::TitleBar(QWidget *parent)
     hBoxLayout->setContentsMargins(0, 0, 0, 0);
     hBoxLayout->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
     hBoxLayout->addStretch(1);
-    hBoxLayout->addWidget(&m_minBtn, 0, Qt::AlignRight);
-    hBoxLayout->addWidget(&m_maxBtn, 0, Qt::AlignRight);
-    hBoxLayout->addWidget(&m_closeBtn, 0, Qt::AlignRight);
+    hBoxLayout->addWidget(m_minBtn, 0, Qt::AlignRight);
+    hBoxLayout->addWidget(m_maxBtn, 0, Qt::AlignRight);
+    hBoxLayout->addWidget(m_closeBtn, 0, Qt::AlignRight);
 
-    m_minBtn.setHoverColor(Qt::white);
-    m_minBtn.setHoverBgColor(QColor(0, 100, 182));
-    m_minBtn.setPressedColor(Qt::white);
-    m_minBtn.setPressedBgColor(QColor(54, 57, 65));
+    m_minBtn->setHoverColor(Qt::white);
+    m_minBtn->setHoverBgColor(QColor(0, 100, 182));
+    m_minBtn->setPressedColor(Qt::white);
+    m_minBtn->setPressedBgColor(QColor(54, 57, 65));
 
-    m_maxBtn.setHoverColor(Qt::white);
-    m_maxBtn.setHoverBgColor(QColor(0, 100, 182));
-    m_maxBtn.setPressedColor(Qt::white);
-    m_maxBtn.setPressedBgColor(QColor(54, 57, 65));
+    m_maxBtn->setHoverColor(Qt::white);
+    m_maxBtn->setHoverBgColor(QColor(0, 100, 182));
+    m_maxBtn->setPressedColor(Qt::white);
+    m_maxBtn->setPressedBgColor(QColor(54, 57, 65));
 
-    connect(&m_minBtn, &QAbstractButton::clicked, window(), &QWidget::showMinimized);
-    connect(&m_maxBtn, &QAbstractButton::clicked, this, &TitleBar::toggleMaxState);
-    connect(&m_closeBtn, &QAbstractButton::clicked, window(), &QWidget::close);
+    connect(
+        m_minBtn, &QAbstractButton::clicked, window(), &QWidget::showMinimized);
+    connect(
+        m_maxBtn, &QAbstractButton::clicked, this, &TitleBar::toggleMaxState);
+    connect(m_closeBtn, &QAbstractButton::clicked, window(), &QWidget::close);
 
     window()->installEventFilter(this);
 
@@ -49,13 +56,8 @@ TitleBar::TitleBar(QWidget *parent)
     hBoxLayout->insertWidget(1, m_iconLabel, 0, Qt::AlignLeft);
     // add title label
     hBoxLayout->insertWidget(2, m_titleLabel, 0, Qt::AlignLeft);
-    // m_titleLabel->setStyleSheet("
-    //     QLabel{
-    //         background: transparent;
-    //         font: 13px 'Segoe UI';
-    //         padding: 0 4px
-    //     }
-    // ");
+    m_titleLabel->setStyleSheet(
+        "QLabel{background: transparent;font: 13px 'Segoe UI';padding: 0 4px}");
     connect(window(), &QWidget::windowIconChanged, this, &TitleBar::setIcon);
     connect(window(), &QWidget::windowTitleChanged, this, &TitleBar::setTitle);
 }
@@ -82,7 +84,7 @@ bool TitleBar::eventFilter(QObject *obj, QEvent *event)
     {
         if (event->type() == QEvent::WindowStateChange)
         {
-            m_maxBtn.setMaxState(window()->isMaximized());
+            m_maxBtn->setMaxState(window()->isMaximized());
             return false;
         }
     }
@@ -104,8 +106,9 @@ void TitleBar::mouseMoveEvent(QMouseEvent *event)
 
 #ifdef Q_OS_WIN
     if (::ReleaseCapture())
-        ::SendMessage(reinterpret_cast<HWND>(window()->winId()), WM_SYSCOMMAND,
-                    SC_MOVE | HTCAPTION, 0);
+        ::SendMessage(
+            reinterpret_cast<HWND>(window()->winId()), WM_SYSCOMMAND,
+            SC_MOVE | HTCAPTION, 0);
 #endif
 }
 
@@ -139,7 +142,7 @@ bool TitleBar::isDragRegion(const QPoint &pos)
 }
 
 bool TitleBar::hasButtonPressed()
-{    
+{
     QList<TitleBarButton *> btns = findChildren<TitleBarButton *>();
     for (auto btn : btns)
     {

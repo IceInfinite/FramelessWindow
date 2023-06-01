@@ -1,8 +1,8 @@
 #ifndef TITLEBAR_H
 #define TITLEBAR_H
 
-#include <QWidget>
 #include <QLabel>
+#include <QWidget>
 
 #include "titlebarbutton.h"
 
@@ -34,12 +34,12 @@ private:
     bool canDrag(const QPoint &pos);
 
 private:
-    MinimizeButton m_minBtn;
-    MaximizeButton m_maxBtn;
-    CloseButton m_closeBtn;
+    MinimizeButton *m_minBtn;
+    MaximizeButton *m_maxBtn;
+    CloseButton *m_closeBtn;
     bool m_isDoubleClickedEnabled;
     QLabel *m_iconLabel;
     QLabel *m_titleLabel;
 };
 
-#endif // TITLEBAR_H
+#endif  // TITLEBAR_H
